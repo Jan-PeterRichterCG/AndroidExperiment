@@ -1,7 +1,6 @@
 package eu.jprichter.squaresandroots.ui;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,11 +11,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import roboguice.activity.GuiceAppCompatActivity;
 import eu.jprichter.squaresandroots.R;
 import eu.jprichter.squaresandroots.kernel.Kernel;
+import roboguice.inject.InjectView;
 
-public class QuestionActivity extends AppCompatActivity {
-    
+public class QuestionActivity extends GuiceAppCompatActivity {
+
+    @InjectView(R.id.question) TextView questionText;
+    @InjectView(R.id.solution) EditText editText;
+    @InjectView(R.id.check_button) Button checkButton;
+
+
     public final static String EXTRA_ROOT_QUESTION = "eu.jprichter.squaresandroots.ui.QuestionActivity.EXTRA_ROOT_QUESTION";
     public final static String EXTRA_SOLUTION = "eu.jprichter.squaresandroots.ui.QuestionActivity.EXTRA_SOLUTION";
     public final static String STATE_ROOT_QUESTION = "eu.jprichter.squaresandroots.ui.QuestionActivity.STATE_ROOT_QUESTION";
@@ -37,11 +43,8 @@ public class QuestionActivity extends AppCompatActivity {
 
         }
 
-        TextView questionText = (TextView) findViewById(R.id.question);
         questionText.setText(root + " * " + root + " = ?");
 
-        EditText editText = (EditText) findViewById(R.id.solution);
-        Button checkButton = (Button) findViewById(R.id.check_button);
         editText.addTextChangedListener(new ButtonEnablerTextWatcher(checkButton));
     }
 
@@ -72,7 +75,6 @@ public class QuestionActivity extends AppCompatActivity {
     }
 
     public void checkSolution(View view) {
-        EditText editText = (EditText) findViewById(R.id.solution);
         int solution = Integer.parseInt(editText.getText().toString());
 
         Intent intent = new Intent(this, CheckActivity.class);

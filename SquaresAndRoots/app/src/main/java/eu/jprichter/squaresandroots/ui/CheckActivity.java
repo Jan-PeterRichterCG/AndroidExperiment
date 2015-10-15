@@ -8,8 +8,12 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import eu.jprichter.squaresandroots.R;
+import roboguice.activity.GuiceAppCompatActivity;
+import roboguice.inject.InjectView;
 
-public class CheckActivity extends AppCompatActivity {
+public class CheckActivity extends GuiceAppCompatActivity {
+
+    @InjectView(R.id.answer) TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +31,6 @@ public class CheckActivity extends AppCompatActivity {
             answer = "Wrong!\n" + root + " * " + root + " = " + root * root;
         }
 
-        TextView textView = (TextView) findViewById(R.id.answer);
         textView.setText(answer);
     }
 
