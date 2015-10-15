@@ -7,6 +7,17 @@ package eu.jprichter.squaresandroots.kernel;
  */
 public class Kernel {
 
+    private static Kernel instance = null;
+
+    public static synchronized Kernel getInstance() {
+        if (instance == null) {
+            instance = new Kernel();
+        }
+
+        return instance;
+
+    }
+
     private int maxSquare;
     private static final int MAX_SQUARE_DEFAULT = 25;
 

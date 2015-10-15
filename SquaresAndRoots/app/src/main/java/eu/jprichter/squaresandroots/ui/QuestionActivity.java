@@ -13,11 +13,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import eu.jprichter.squaresandroots.R;
-import eu.jprichter.squaresandroots.kernel.DaggerKernelComponent;
 import eu.jprichter.squaresandroots.kernel.Kernel;
-import eu.jprichter.squaresandroots.kernel.KernelComponent;
-import eu.jprichter.squaresandroots.kernel.KernelModule;
-import eu.jprichter.squaresandroots.ui.CheckActivity;
 
 public class QuestionActivity extends AppCompatActivity {
     
@@ -37,11 +33,7 @@ public class QuestionActivity extends AppCompatActivity {
 
         if(root == 0) {
 
-            KernelComponent kernelComponent;
-            kernelComponent = DaggerKernelComponent.builder().kernelModule(new KernelModule()).build();
-            Kernel kernel = kernelComponent.provideKernel();
-
-            root =  (Double.valueOf(Math.random()*kernel.getMaxSquare())).intValue()+1;
+            root =  (Double.valueOf(Math.random()*Kernel.getInstance().getMaxSquare())).intValue()+1;
 
         }
 
