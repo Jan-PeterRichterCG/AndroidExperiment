@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">SquaresAndRoots</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="enterSolutionHint">enter solution</string>
+    <string name="check_button">Check!</string>
+    <string name="title_activity_check">Check</string>
+</resources>
