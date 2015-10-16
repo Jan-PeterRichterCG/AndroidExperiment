@@ -9,8 +9,10 @@ import android.widget.TextView;
 
 import eu.jprichter.squaresandroots.R;
 import roboguice.activity.GuiceAppCompatActivity;
+import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 
+@ContentView(R.layout.activity_check)
 public class CheckActivity extends GuiceAppCompatActivity {
 
     @InjectView(R.id.answer) TextView textView;
@@ -18,7 +20,6 @@ public class CheckActivity extends GuiceAppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_check);
 
         Intent intent = getIntent();
         int root = intent.getIntExtra(QuestionActivity.EXTRA_ROOT_QUESTION, -1);

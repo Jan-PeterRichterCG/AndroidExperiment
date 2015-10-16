@@ -11,17 +11,25 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.inject.Inject;
+
+import eu.jprichter.squaresandroots.kernel.IKernel;
 import roboguice.activity.GuiceAppCompatActivity;
 import eu.jprichter.squaresandroots.R;
-import eu.jprichter.squaresandroots.kernel.Kernel;
+import eu.jprichter.squaresandroots.kernel.impl.Kernel;
+import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 
+@ContentView(R.layout.activity_question)
 public class QuestionActivity extends GuiceAppCompatActivity {
+
+    @Inject
+    IKernel kernel;
 
     @InjectView(R.id.question) TextView questionText;
     @InjectView(R.id.solution) EditText editText;
     @InjectView(R.id.check_button) Button checkButton;
-
+    @InjectView(R.id.statistics) TextView statisticsText;
 
     public final static String EXTRA_ROOT_QUESTION = "eu.jprichter.squaresandroots.ui.QuestionActivity.EXTRA_ROOT_QUESTION";
     public final static String EXTRA_SOLUTION = "eu.jprichter.squaresandroots.ui.QuestionActivity.EXTRA_SOLUTION";
@@ -32,18 +40,17 @@ public class QuestionActivity extends GuiceAppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_question);
 
         if(savedInstanceState != null)
             root = savedInstanceState.getInt(STATE_ROOT_QUESTION, 0);
 
+        int maxRoot = kernel.getMaxRoot();
         if(root == 0) {
-
-            root =  (Double.valueOf(Math.random()*Kernel.getInstance().getMaxSquare())).intValue()+1;
-
+            root =  (Double.valueOf(Math.random()*maxRoot)).intValue()+1;
         }
 
         questionText.setText(root + " * " + root + " = ?");
+        statisticsText.setText("MaxRoot = " + maxRoot + "\nKernel object: " + kernel);
 
         editText.addTextChangedListener(new ButtonEnablerTextWatcher(checkButton));
     }
@@ -83,13 +90,14 @@ public class QuestionActivity extends GuiceAppCompatActivity {
 
         startActivity(intent);
 
+        kernel.setMaxRoot(kernel.getMaxRoot() - 1);
         root = 0; // signals that a new question has to be generated
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_question, menu);
+        getMenuInflater().inflate(R.menu.menu_question , menu);
         return true;
     }
 
