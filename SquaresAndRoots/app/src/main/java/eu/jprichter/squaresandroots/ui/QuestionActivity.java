@@ -16,7 +16,6 @@ import com.google.inject.Inject;
 import eu.jprichter.squaresandroots.kernel.IKernel;
 import roboguice.activity.GuiceAppCompatActivity;
 import eu.jprichter.squaresandroots.R;
-import eu.jprichter.squaresandroots.kernel.impl.Kernel;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 
@@ -35,22 +34,26 @@ public class QuestionActivity extends GuiceAppCompatActivity {
     public final static String EXTRA_SOLUTION = "eu.jprichter.squaresandroots.ui.QuestionActivity.EXTRA_SOLUTION";
     public final static String STATE_ROOT_QUESTION = "eu.jprichter.squaresandroots.ui.QuestionActivity.STATE_ROOT_QUESTION";
 
-    int root = 0;
+    private int rootQuestion = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if(savedInstanceState != null)
-            root = savedInstanceState.getInt(STATE_ROOT_QUESTION, 0);
+            rootQuestion = savedInstanceState.getInt(STATE_ROOT_QUESTION, 0);
 
         int maxRoot = kernel.getMaxRoot();
-        if(root == 0) {
-            root =  (Double.valueOf(Math.random()*maxRoot)).intValue()+1;
+        if(rootQuestion == 0) {
+            rootQuestion =  kernel.getRandomRoot();
         }
 
-        questionText.setText(root + " * " + root + " = ?");
-        statisticsText.setText("MaxRoot = " + maxRoot + "\nKernel object: " + kernel);
+        questionText.setText(rootQuestion + " * " + rootQuestion + " = ?");
+        statisticsText.setText("MaxRoot = " + maxRoot);
+        for (int n=1; n <= kernel.getMaxRoot(); n++) {
+            int succ = kernel.getSucessful(n);
+            statisticsText.append("\nRoot " + n + ": " + succ + "/" + (succ + kernel.getFailed(n)));
+        }
 
         editText.addTextChangedListener(new ButtonEnablerTextWatcher(checkButton));
     }
@@ -85,13 +88,12 @@ public class QuestionActivity extends GuiceAppCompatActivity {
         int solution = Integer.parseInt(editText.getText().toString());
 
         Intent intent = new Intent(this, CheckActivity.class);
-        intent.putExtra(EXTRA_ROOT_QUESTION, root);
+        intent.putExtra(EXTRA_ROOT_QUESTION, rootQuestion);
         intent.putExtra(EXTRA_SOLUTION, solution);
 
         startActivity(intent);
 
-        kernel.setMaxRoot(kernel.getMaxRoot() - 1);
-        root = 0; // signals that a new question has to be generated
+        rootQuestion = 0; // signals that a new question has to be generated
     }
 
     @Override
@@ -104,7 +106,7 @@ public class QuestionActivity extends GuiceAppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         // Save the user's current game state
-        savedInstanceState.putInt(STATE_ROOT_QUESTION, root);
+        savedInstanceState.putInt(STATE_ROOT_QUESTION, rootQuestion);
 
         // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);

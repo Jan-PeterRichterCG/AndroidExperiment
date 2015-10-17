@@ -7,7 +7,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.google.inject.Inject;
+
 import eu.jprichter.squaresandroots.R;
+import eu.jprichter.squaresandroots.kernel.IKernel;
 import roboguice.activity.GuiceAppCompatActivity;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
@@ -16,6 +19,7 @@ import roboguice.inject.InjectView;
 public class CheckActivity extends GuiceAppCompatActivity {
 
     @InjectView(R.id.answer) TextView textView;
+    @Inject IKernel kernel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +32,10 @@ public class CheckActivity extends GuiceAppCompatActivity {
         String answer;
         if(root * root - solution == 0) {
             answer="Correct!\n" + root + " * " + root + " = " + solution;
+            kernel.noteSuccess(root);
         } else {
             answer = "Wrong!\n" + root + " * " + root + " = " + root * root;
+            kernel.noteFailure(root);
         }
 
         textView.setText(answer);
