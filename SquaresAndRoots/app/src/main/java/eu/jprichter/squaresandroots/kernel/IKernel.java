@@ -21,7 +21,12 @@ public interface IKernel {
     public void setMaxRoot(int maxRoot);
 
     /**
-     * Get a random root value 0 <= x <= MaxRoot.
+     * Get a random root value 1 <= x <= MaxRoot. The odds for a root decrease as the root and
+     * its square are guessed / known correctly. If all roots and squares have been guessed /
+     * known MAX_SUCCESS times, the probability for that root is 0.
+     *
+     * Attention: In case there are no more roots left to be guessed, getRandomRoot returns 0.
+     *
      * @return the maximumm of randomly created roots
      */
     public int getRandomRoot();

@@ -15,7 +15,10 @@ import eu.jprichter.squaresandroots.kernel.IKernel;
 @Singleton
 public class Kernel implements IKernel {
 
-    private static final int MAX_ROOT_DEFAULT = 10;
+    // the max number of successful guesses until the root will not be asked any more.
+    private static final int MAX_SUCCESS = 3;
+
+    private static final int MAX_ROOT_DEFAULT = 25;
     private int maxRoot = MAX_ROOT_DEFAULT;
 
     private SparseIntArray successes = new SparseIntArray(MAX_ROOT_DEFAULT);
@@ -31,7 +34,27 @@ public class Kernel implements IKernel {
     }
 
     public int getRandomRoot() {
-        return  (Double.valueOf(Math.random()*maxRoot)).intValue()+1;
+
+        int sumSuccesses = 0;
+        for (int i=0; i<=maxRoot; i++) {
+            sumSuccesses += successes.get(i);
+        }
+
+        if(sumSuccesses == maxRoot * MAX_SUCCESS)
+            return 0;
+
+        int triesLeft = maxRoot * MAX_SUCCESS - sumSuccesses;
+
+        int pick = (Double.valueOf(Math.random()*triesLeft)).intValue()+1;
+
+        int root=0;
+        while(pick > 0) {
+            root++;
+            pick -= (MAX_SUCCESS - successes.get(root));
+        }
+
+        return  (root);
+
     }
 
     public void resetStatistics() {
@@ -46,7 +69,7 @@ public class Kernel implements IKernel {
 
     @Override
     public  void noteFailure(int root) {
-        failures.put(root,(successes.get(root) + 1));
+        failures.put(root,(failures.get(root) + 1));
     }
 
     @Override

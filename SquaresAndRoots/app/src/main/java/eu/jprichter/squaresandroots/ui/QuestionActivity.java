@@ -46,6 +46,11 @@ public class QuestionActivity extends GuiceAppCompatActivity {
         int maxRoot = kernel.getMaxRoot();
         if(rootQuestion == 0) {
             rootQuestion =  kernel.getRandomRoot();
+            if (rootQuestion == 0) {
+                // some kind of "Congratulations - you've done it!" screen should be shown
+                kernel.resetStatistics();
+                rootQuestion =  kernel.getRandomRoot();
+            }
         }
 
         questionText.setText(rootQuestion + " * " + rootQuestion + " = ?");
