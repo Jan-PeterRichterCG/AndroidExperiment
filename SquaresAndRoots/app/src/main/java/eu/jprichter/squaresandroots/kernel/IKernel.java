@@ -8,6 +8,8 @@ import com.google.inject.Inject;
  */
 public interface IKernel {
 
+    // public static final String KEY_PREF_MAX_ROOT = "pref_max_root";
+
     /** Get the maximum number of successful attempts for a root
      * @return the maximum number of successful attempts for a root
      */

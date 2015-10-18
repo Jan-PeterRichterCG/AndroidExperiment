@@ -1,29 +1,49 @@
 package eu.jprichter.squaresandroots.kernel.impl;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.SparseIntArray;
 
 import com.google.inject.Singleton;
 
+import eu.jprichter.squaresandroots.SquaresRootsApp;
 import eu.jprichter.squaresandroots.kernel.IKernel;
+import eu.jprichter.squaresandroots.R;
+
 import roboguice.util.Ln;
 
 /**
  * The App's kernel that basically holds the entire state of the application and offers the
  *  functionality that is independent of the UI
- *  * Created by jrichter on 13.10.2015.
+ *
+ *  Created by jrichter on 13.10.2015.
  */
 
 @Singleton
 public class Kernel implements IKernel {
 
     // the max number of successful guesses until the root will not be asked any more.
-    private static final int MAX_SUCCESS = 2;
+    private static final int MAX_SUCCESS = 3;
 
-    private static final int MAX_ROOT_DEFAULT = 5;
-    private int maxRoot = MAX_ROOT_DEFAULT;
+    private int maxRoot;
 
-    private SparseIntArray successes = new SparseIntArray(MAX_ROOT_DEFAULT);
-    private SparseIntArray failures = new SparseIntArray(MAX_ROOT_DEFAULT);
+    private SparseIntArray successes;
+    private SparseIntArray failures;
+
+    /**
+     * Constructor to be used by RoboGuice only!
+     */
+    Kernel() {
+        Ln.d("XXXXXXXXXXXXXXXXXX Kernel instantiation started");
+        // read the persistent value of the maxRoot preference
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(SquaresRootsApp.getStaticContext());
+        String keyPrefMaxRootString =SquaresRootsApp.getStaticResources().getString(R.string.key_pref_max_root);
+        String maxRootPrefString = sharedPref.getString(keyPrefMaxRootString, "");
+        setMaxRoot(Integer.valueOf(maxRootPrefString));
+        Ln.d("XXXXXXXXXXXXXXXXXX maxRoot set to '" + maxRootPrefString + "'");
+
+        resetStatistics();
+    }
 
     public int getMaxSuccess() { return MAX_SUCCESS; }
 
@@ -67,8 +87,8 @@ public class Kernel implements IKernel {
     public void resetStatistics() {
         Ln.d("XXXXXXXXXXXXXXXXXX resetting statistics!");
 
-        successes = new SparseIntArray(MAX_ROOT_DEFAULT);
-        failures = new SparseIntArray(MAX_ROOT_DEFAULT);
+        successes = new SparseIntArray(maxRoot);
+        failures = new SparseIntArray(maxRoot);
     }
 
     @Override

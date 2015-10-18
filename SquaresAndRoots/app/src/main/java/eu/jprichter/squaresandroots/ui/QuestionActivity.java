@@ -46,10 +46,10 @@ public class QuestionActivity extends GuiceAppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         if(savedInstanceState != null)
             rootQuestion = savedInstanceState.getInt(STATE_ROOT_QUESTION, 0);
 
-        int maxRoot = kernel.getMaxRoot();
         if(rootQuestion == 0) {
             Ln.d("XXXXXXXXXXXXXXXXXX Generate new question.");
             rootQuestion =  kernel.getRandomRoot();
@@ -62,13 +62,20 @@ public class QuestionActivity extends GuiceAppCompatActivity {
         }
 
         questionText.setText(rootQuestion + " * " + rootQuestion + " = ?");
-        statisticsText.setText("MaxRoot = " + maxRoot);
+        editText.addTextChangedListener(new ButtonEnablerTextWatcher(checkButton));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Ln.d("XXXXXXXXXXXXXXXXXX Resume QuestionActivity - maxRoot: " + kernel.getMaxRoot());
+        statisticsText.setText("Statistics:");
+
         for (int n=1; n <= kernel.getMaxRoot(); n++) {
             int succ = kernel.getSucessful(n);
             statisticsText.append("\nRoot " + n + ": " + succ + "/" + (succ + kernel.getFailed(n)));
         }
-
-        editText.addTextChangedListener(new ButtonEnablerTextWatcher(checkButton));
     }
 
     private class ButtonEnablerTextWatcher implements TextWatcher {
@@ -137,6 +144,10 @@ public class QuestionActivity extends GuiceAppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+
             return true;
         }
 
