@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.CheckActivity"
+            android:name=".ui.AnswerActivity"
             android:label="@string/title_activity_check"
             android:parentActivityName=".ui.QuestionActivity" >
             <meta-data

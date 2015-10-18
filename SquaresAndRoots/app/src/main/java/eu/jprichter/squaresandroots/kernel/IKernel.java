@@ -8,6 +8,11 @@ import com.google.inject.Inject;
  */
 public interface IKernel {
 
+    /** Get the maximum number of successful attempts for a root
+     * @return the maximum number of successful attempts for a root
+     */
+    public int getMaxSuccess();
+
     /**
      * Get the maximumm of randomly created roots.
      * @return the maximumm of randomly created roots
@@ -37,16 +42,11 @@ public interface IKernel {
     public void resetStatistics();
 
     /**
-     * Note a successful attempt to guess a square from a root in the statistics.
-     * @param root the root for which the square was successfully guessed/known
+     * Checks whether a guessed root / square pair is correct. Also updates the statistics
+     * on guesses.
+     * @return true if root / square pair is correct
      */
-    public void noteSuccess(int root);
-
-    /**
-     * Note a failed attempt to guess a square from a root in the statistics.
-     * @param root the root for which the square was unsuccessfully guessed
-     */
-    public void noteFailure(int root);
+    public boolean checkRootSquare(int root, int square);
 
     /**
      * Get the statistics for successful attempts to guess/know the square of a given root

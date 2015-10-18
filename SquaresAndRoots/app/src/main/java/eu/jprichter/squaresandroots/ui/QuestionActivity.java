@@ -13,11 +13,12 @@ import android.widget.TextView;
 
 import com.google.inject.Inject;
 
+import eu.jprichter.squaresandroots.R;
 import eu.jprichter.squaresandroots.kernel.IKernel;
 import roboguice.activity.GuiceAppCompatActivity;
-import eu.jprichter.squaresandroots.R;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
+import roboguice.util.Ln;
 
 @ContentView(R.layout.activity_question)
 public class QuestionActivity extends GuiceAppCompatActivity {
@@ -30,9 +31,14 @@ public class QuestionActivity extends GuiceAppCompatActivity {
     @InjectView(R.id.check_button) Button checkButton;
     @InjectView(R.id.statistics) TextView statisticsText;
 
+    @Inject CongratulationsDialogFragment congratulations;
+
     public final static String EXTRA_ROOT_QUESTION = "eu.jprichter.squaresandroots.ui.QuestionActivity.EXTRA_ROOT_QUESTION";
     public final static String EXTRA_SOLUTION = "eu.jprichter.squaresandroots.ui.QuestionActivity.EXTRA_SOLUTION";
+    public final static String EXTRA_CORRECT = "eu.jprichter.squaresandroots.ui.QuestionActivity.EXTRA_CORRECT";
     public final static String STATE_ROOT_QUESTION = "eu.jprichter.squaresandroots.ui.QuestionActivity.STATE_ROOT_QUESTION";
+
+    public final static String CONGRATULATIONS_POPUP_FRAGMENT = "eu.jprichter.squaresandroots.ui.QuestionActivity.CONGRATULATIONS_POPUP";
 
     private int rootQuestion = 0;
 
@@ -45,9 +51,11 @@ public class QuestionActivity extends GuiceAppCompatActivity {
 
         int maxRoot = kernel.getMaxRoot();
         if(rootQuestion == 0) {
+            Ln.d("XXXXXXXXXXXXXXXXXX Generate new question.");
             rootQuestion =  kernel.getRandomRoot();
             if (rootQuestion == 0) {
-                // some kind of "Congratulations - you've done it!" screen should be shown
+                // some kind of "Congratulations - you've done it!" screen is shown
+                congratulations.show(getSupportFragmentManager(), CONGRATULATIONS_POPUP_FRAGMENT);
                 kernel.resetStatistics();
                 rootQuestion =  kernel.getRandomRoot();
             }
@@ -91,10 +99,13 @@ public class QuestionActivity extends GuiceAppCompatActivity {
 
     public void checkSolution(View view) {
         int solution = Integer.parseInt(editText.getText().toString());
+        // kernel.checkRootSquare also updates the statistics
+        boolean correct = kernel.checkRootSquare(rootQuestion, solution);
 
-        Intent intent = new Intent(this, CheckActivity.class);
+        Intent intent = new Intent(this, AnswerActivity.class);
         intent.putExtra(EXTRA_ROOT_QUESTION, rootQuestion);
         intent.putExtra(EXTRA_SOLUTION, solution);
+        intent.putExtra(EXTRA_CORRECT, correct);
 
         startActivity(intent);
 

@@ -5,4 +5,7 @@
     <string name="enterSolutionHint">enter solution</string>
     <string name="check_button">Check!</string>
     <string name="title_activity_check">Check</string>
+
+    <string name="congratulations">"Congratulations!\nYou have sucessfully solved all roots/squares multiple times!"</string>
+    <string name="ok_button">OK</string>
 </resources>

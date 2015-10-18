@@ -16,7 +16,7 @@ import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 
 @ContentView(R.layout.activity_check)
-public class CheckActivity extends GuiceAppCompatActivity {
+public class AnswerActivity extends GuiceAppCompatActivity {
 
     @InjectView(R.id.answer) TextView textView;
     @Inject IKernel kernel;
@@ -28,14 +28,14 @@ public class CheckActivity extends GuiceAppCompatActivity {
         Intent intent = getIntent();
         int root = intent.getIntExtra(QuestionActivity.EXTRA_ROOT_QUESTION, -1);
         int solution = intent.getIntExtra(QuestionActivity.EXTRA_SOLUTION, -1);
+        boolean correct = intent.getBooleanExtra(QuestionActivity.EXTRA_CORRECT, false);
 
         String answer;
-        if(root * root - solution == 0) {
+        if(correct) {
             answer="Correct!\n" + root + " * " + root + " = " + solution;
-            kernel.noteSuccess(root);
         } else {
-            answer = "Wrong!\n" + root + " * " + root + " = " + root * root;
-            kernel.noteFailure(root);
+            answer = "The answer " + solution + " is wrong\n" +
+                    root + " * " + root + " = " + root * root;
         }
 
         textView.setText(answer);
