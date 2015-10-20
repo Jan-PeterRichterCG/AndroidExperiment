@@ -12,6 +12,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.inject.Inject;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.BarGraphSeries;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.Series;
+
+import java.util.List;
 
 import eu.jprichter.squaresandroots.R;
 import eu.jprichter.squaresandroots.kernel.IKernel;
@@ -29,7 +36,10 @@ public class QuestionActivity extends GuiceAppCompatActivity {
     @InjectView(R.id.question) TextView questionText;
     @InjectView(R.id.solution) EditText editText;
     @InjectView(R.id.check_button) Button checkButton;
+    @InjectView(R.id.graph) GraphView graph;
+    /*
     @InjectView(R.id.statistics) TextView statisticsText;
+     */
 
     @Inject CongratulationsDialogFragment congratulations;
 
@@ -70,12 +80,33 @@ public class QuestionActivity extends GuiceAppCompatActivity {
         super.onResume();
 
         Ln.d("XXXXXXXXXXXXXXXXXX Resume QuestionActivity - maxRoot: " + kernel.getMaxRoot());
+
+        if (graph.getSeries().isEmpty()) {
+            BarGraphSeries<DataPoint> series = new BarGraphSeries<DataPoint>();
+            int max = kernel.getMaxRoot();
+            for (int n=1; n <= max; n++) {
+                int succ = kernel.getSucessful(n);
+                DataPoint dp = new DataPoint(n,succ);
+                series.appendData(dp, false, max);
+            }
+            series.setSpacing(25);
+            series.setDrawValuesOnTop(true);
+            graph.addSeries(series);
+        } else {
+            List<Series> seriesList = graph.getSeries();
+            for (Series s : seriesList) {
+                Ln.d("XXXXXXXXXXXXXXXXXX Resume QuestionActivity - Series: " + s.toString() + " found.");
+            }
+            graph.refreshDrawableState();
+        }
+        /*
         statisticsText.setText("Statistics:");
 
         for (int n=1; n <= kernel.getMaxRoot(); n++) {
             int succ = kernel.getSucessful(n);
             statisticsText.append("\nRoot " + n + ": " + succ + "/" + (succ + kernel.getFailed(n)));
         }
+        */
     }
 
     private class ButtonEnablerTextWatcher implements TextWatcher {
