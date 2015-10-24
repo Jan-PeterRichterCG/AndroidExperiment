@@ -35,6 +35,17 @@ public class SettingsActivity extends RoboPreferenceActivity
         super.onResume();
         getPreferenceScreen().getSharedPreferences()
                 .registerOnSharedPreferenceChangeListener(this);
+
+        Ln.d("XXXXXXXXXXXXXXXXX Settings Activity resumed");
+
+
+        String maxRootString = getPreferenceScreen().getSharedPreferences().getString(
+                getResources().getString(R.string.key_pref_max_root),"");
+
+        Preference pref = findPreference(getResources().getString(R.string.key_pref_max_root));
+        pref.setSummary(getResources().getString(R.string.pref_max_root_summary_prefix)
+                + maxRootString);
+
     }
 
     @Override
@@ -51,10 +62,16 @@ public class SettingsActivity extends RoboPreferenceActivity
 
         String keyPrefMaxRoot = getResources().getString(R.string.key_pref_max_root);
         if (key.equals(keyPrefMaxRoot)) {
-            String maxRootPrefString = sharedPreferences.getString(keyPrefMaxRoot, "");
-            Ln.d("XXXXXXXXXXXXXXXXX Preference " + keyPrefMaxRoot + " changed: " + maxRootPrefString);
 
-            kernel.setMaxRoot(Integer.valueOf(maxRootPrefString));
+            String maxRootPrefString = sharedPreferences.getString(keyPrefMaxRoot, "");
+
+            Preference pref = findPreference(keyPrefMaxRoot);
+            pref.setSummary(getResources().getString(R.string.pref_max_root_summary_prefix)
+                    + maxRootPrefString);
+
+           Ln.d("XXXXXXXXXXXXXXXXX Preference " + keyPrefMaxRoot + " changed: " + maxRootPrefString);
+
+           kernel.setMaxRoot(Integer.valueOf(maxRootPrefString));
         }
     }
 }

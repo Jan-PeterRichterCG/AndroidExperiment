@@ -12,6 +12,6 @@
     <string name="title_activity_settings">Settings</string>
     <string name="key_pref_max_root">pref_max_root</string>
     <string name="pref_max_root">Maximum Root</string>
-    <string name="pref_max_root_sum">The maximum value for a randomly generated root to be asked.</string>
+    <string name="pref_max_root_summary_prefix">Highest value to be squared: </string>
 
 </resources>
