@@ -44,18 +44,27 @@
         android:layout_alignRight="@+id/solution"
         android:layout_alignEnd="@+id/solution" />
 
+
+
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/scrollView"
         android:layout_below="@+id/solution"
-        android:layout_centerHorizontal="true" >
+        >
+        <eu.jprichter.squaresandroots.ui.StatisticsDrawableView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/statisticsView"
+            android:minHeight="500dp" />
 
+    </ScrollView>
+        <!--
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Statistics"
             android:id="@+id/statistics" />
-    </ScrollView>
+            -->
 </RelativeLayout>

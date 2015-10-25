@@ -1,14 +1,19 @@
 package eu.jprichter.squaresandroots.ui;
 
 import android.content.Intent;
+import android.hardware.display.DisplayManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Gallery;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.inject.Inject;
@@ -29,9 +34,12 @@ public class QuestionActivity extends GuiceAppCompatActivity {
     @InjectView(R.id.question) TextView questionText;
     @InjectView(R.id.solution) EditText editText;
     @InjectView(R.id.check_button) Button checkButton;
-    @InjectView(R.id.statistics) TextView statisticsText;
-
+    /* @InjectView(R.id.statistics) TextView statisticsText; */
     @Inject CongratulationsDialogFragment congratulations;
+
+    /*
+    @InjectView(R.id.statisticsRelLay) RelativeLayout statisticsRelLay;
+    */
 
     public final static String EXTRA_ROOT_QUESTION = "eu.jprichter.squaresandroots.ui.QuestionActivity.EXTRA_ROOT_QUESTION";
     public final static String EXTRA_SOLUTION = "eu.jprichter.squaresandroots.ui.QuestionActivity.EXTRA_SOLUTION";
@@ -42,10 +50,13 @@ public class QuestionActivity extends GuiceAppCompatActivity {
 
     private int rootQuestion = 0;
 
+    /*
+    private StatisticsDrawableView image;
+    */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         if(savedInstanceState != null)
             rootQuestion = savedInstanceState.getInt(STATE_ROOT_QUESTION, 0);
@@ -63,6 +74,15 @@ public class QuestionActivity extends GuiceAppCompatActivity {
 
         questionText.setText(rootQuestion + " * " + rootQuestion + " = ?");
         editText.addTextChangedListener(new ButtonEnablerTextWatcher(checkButton));
+
+        /*
+        image = new StatisticsDrawableView(this);
+        image.setLayoutParams(new Gallery.LayoutParams(Gallery.LayoutParams.WRAP_CONTENT,
+                Gallery.LayoutParams.WRAP_CONTENT));
+
+        // Add the ImageView to the layout
+        statisticsRelLay.addView(image);
+    */
     }
 
     @Override
@@ -70,11 +90,13 @@ public class QuestionActivity extends GuiceAppCompatActivity {
         super.onResume();
 
         Ln.d("XXXXXXXXXXXXXXXXXX Resume QuestionActivity - maxRoot: " + kernel.getMaxRoot());
-        statisticsText.setText("Statistics:");
+        /* statisticsText.setText("Statistics:"); */
 
         for (int n=1; n <= kernel.getMaxRoot(); n++) {
             int succ = kernel.getSucessful(n);
+            /*
             statisticsText.append("\nRoot " + n + ": " + succ + "/" + (succ + kernel.getFailed(n)));
+            */
         }
     }
 
