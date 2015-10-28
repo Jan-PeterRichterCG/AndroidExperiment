@@ -24,18 +24,13 @@ import roboguice.util.Ln;
 @ContentView(R.layout.activity_question)
 public class QuestionActivity extends GuiceAppCompatActivity {
 
-    @Inject
-    IKernel kernel;
+    @Inject IKernel kernel;
 
     @InjectView(R.id.question) TextView questionText;
     @InjectView(R.id.solution) EditText editText;
     @InjectView(R.id.check_button) Button checkButton;
-    /* @InjectView(R.id.statistics) TextView statisticsText; */
     @Inject CongratulationsDialogFragment congratulations;
 
-    /*
-    @InjectView(R.id.statisticsRelLay) RelativeLayout statisticsRelLay;
-    */
 
     public final static String EXTRA_ROOT_QUESTION = "eu.jprichter.squaresandroots.ui.QuestionActivity.EXTRA_ROOT_QUESTION";
     public final static String EXTRA_SOLUTION = "eu.jprichter.squaresandroots.ui.QuestionActivity.EXTRA_SOLUTION";
@@ -45,10 +40,6 @@ public class QuestionActivity extends GuiceAppCompatActivity {
     public final static String CONGRATULATIONS_POPUP_FRAGMENT = "eu.jprichter.squaresandroots.ui.QuestionActivity.CONGRATULATIONS_POPUP";
 
     private int rootQuestion = 0;
-
-    /*
-    private StatisticsDrawableView image;
-    */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +61,6 @@ public class QuestionActivity extends GuiceAppCompatActivity {
 
         questionText.setText(rootQuestion + " * " + rootQuestion + " = ?");
         editText.addTextChangedListener(new ButtonEnablerTextWatcher(checkButton));
-
     }
 
     @Override
@@ -78,14 +68,6 @@ public class QuestionActivity extends GuiceAppCompatActivity {
         super.onResume();
 
         Ln.d("XXXXXXXXXXXXXXXXXX Resume QuestionActivity - maxRoot: " + kernel.getMaxRoot());
-        /* statisticsText.setText("Statistics:"); */
-
-        for (int n=1; n <= kernel.getMaxRoot(); n++) {
-            int succ = kernel.getSucessful(n);
-            /*
-            statisticsText.append("\nRoot " + n + ": " + succ + "/" + (succ + kernel.getFailed(n)));
-            */
-        }
     }
 
     private class ButtonEnablerTextWatcher implements TextWatcher {
