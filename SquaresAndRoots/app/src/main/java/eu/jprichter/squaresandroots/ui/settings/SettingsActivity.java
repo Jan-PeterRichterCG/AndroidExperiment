@@ -8,7 +8,9 @@ import com.google.inject.Inject;
 
 import eu.jprichter.squaresandroots.R;
 import eu.jprichter.squaresandroots.kernel.IKernel;
+import eu.jprichter.squaresandroots.ui.StatisticsDrawableView;
 import roboguice.activity.RoboPreferenceActivity;
+import roboguice.inject.InjectView;
 import roboguice.util.Ln;
 
 /**
@@ -18,7 +20,8 @@ import roboguice.util.Ln;
 public class SettingsActivity extends RoboPreferenceActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    @Inject IKernel kernel;
+    @Inject
+    IKernel kernel;
 
     private MaxRootPreferenceStringValidator maxRootPreferenceStringValidator;
 
@@ -38,7 +41,7 @@ public class SettingsActivity extends RoboPreferenceActivity
         Ln.d("XXXXXXXXXXXXXXXXX Settings Activity resumed");
 
         String maxRootString = getPreferenceScreen().getSharedPreferences().getString(
-                getResources().getString(R.string.key_pref_max_root),"");
+                getResources().getString(R.string.key_pref_max_root), "");
 
         Preference pref = findPreference(getResources().getString(R.string.key_pref_max_root));
         pref.setSummary(getResources().getString(R.string.pref_max_root_summary_prefix)
@@ -71,9 +74,9 @@ public class SettingsActivity extends RoboPreferenceActivity
             pref.setSummary(getResources().getString(R.string.pref_max_root_summary_prefix)
                     + maxRootPrefString);
 
-           Ln.d("XXXXXXXXXXXXXXXXX SharedPreference " + keyPrefMaxRoot + " changed: " + maxRootPrefString);
+            Ln.d("XXXXXXXXXXXXXXXXX SharedPreference " + keyPrefMaxRoot + " changed: " + maxRootPrefString);
 
-           kernel.setMaxRoot(Integer.valueOf(maxRootPrefString));
+            kernel.setMaxRoot(Integer.valueOf(maxRootPrefString));
         }
     }
 

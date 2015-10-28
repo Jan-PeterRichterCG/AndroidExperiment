@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -29,6 +30,7 @@ public class QuestionActivity extends GuiceAppCompatActivity {
     @InjectView(R.id.question) TextView questionText;
     @InjectView(R.id.solution) EditText editText;
     @InjectView(R.id.check_button) Button checkButton;
+    @InjectView(R.id.statisticsView) StatisticsDrawableView statisticsView;
     @Inject CongratulationsDialogFragment congratulations;
 
 
@@ -66,8 +68,9 @@ public class QuestionActivity extends GuiceAppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
         Ln.d("XXXXXXXXXXXXXXXXXX Resume QuestionActivity - maxRoot: " + kernel.getMaxRoot());
+
+        statisticsView.invalidate();
     }
 
     private class ButtonEnablerTextWatcher implements TextWatcher {
