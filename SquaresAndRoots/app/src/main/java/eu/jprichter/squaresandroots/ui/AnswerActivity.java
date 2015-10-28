@@ -1,7 +1,6 @@
 package eu.jprichter.squaresandroots.ui;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,6 +10,7 @@ import com.google.inject.Inject;
 
 import eu.jprichter.squaresandroots.R;
 import eu.jprichter.squaresandroots.kernel.IKernel;
+import eu.jprichter.squaresandroots.ui.settings.SettingsActivity;
 import roboguice.activity.GuiceAppCompatActivity;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;

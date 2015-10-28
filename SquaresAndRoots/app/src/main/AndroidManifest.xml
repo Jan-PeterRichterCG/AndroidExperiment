@@ -31,7 +31,7 @@
                 android:value="eu.jprichter.squaresandroots.ui.QuestionActivity" />
         </activity>
         <activity
-            android:name=".ui.SettingsActivity"
+            android:name=".ui.settings.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".ui.QuestionActivity" >
             <meta-data

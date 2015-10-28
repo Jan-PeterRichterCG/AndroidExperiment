@@ -1,10 +1,8 @@
-package eu.jprichter.squaresandroots.ui;
+package eu.jprichter.squaresandroots.ui.settings;
 
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.preference.PreferenceManager;
 
 import com.google.inject.Inject;
 
@@ -22,22 +20,22 @@ public class SettingsActivity extends RoboPreferenceActivity
 
     @Inject IKernel kernel;
 
+    private MaxRootPreferenceStringValidator maxRootPreferenceStringValidator;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         addPreferencesFromResource(R.xml.preferences);
+
+        maxRootPreferenceStringValidator = new MaxRootPreferenceStringValidator();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        getPreferenceScreen().getSharedPreferences()
-                .registerOnSharedPreferenceChangeListener(this);
-
         Ln.d("XXXXXXXXXXXXXXXXX Settings Activity resumed");
-
 
         String maxRootString = getPreferenceScreen().getSharedPreferences().getString(
                 getResources().getString(R.string.key_pref_max_root),"");
@@ -46,6 +44,10 @@ public class SettingsActivity extends RoboPreferenceActivity
         pref.setSummary(getResources().getString(R.string.pref_max_root_summary_prefix)
                 + maxRootString);
 
+        pref.setOnPreferenceChangeListener(maxRootPreferenceStringValidator);
+
+        getPreferenceScreen().getSharedPreferences()
+                .registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -57,7 +59,7 @@ public class SettingsActivity extends RoboPreferenceActivity
 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
                                           String key) {
-        Ln.d("XXXXXXXXXXXXXXXXX Preference " + key + " changed: " +
+        Ln.d("XXXXXXXXXXXXXXXXX SharedPreference " + key + " changed: " +
                 sharedPreferences.getString(key, ""));
 
         String keyPrefMaxRoot = getResources().getString(R.string.key_pref_max_root);
@@ -69,9 +71,10 @@ public class SettingsActivity extends RoboPreferenceActivity
             pref.setSummary(getResources().getString(R.string.pref_max_root_summary_prefix)
                     + maxRootPrefString);
 
-           Ln.d("XXXXXXXXXXXXXXXXX Preference " + keyPrefMaxRoot + " changed: " + maxRootPrefString);
+           Ln.d("XXXXXXXXXXXXXXXXX SharedPreference " + keyPrefMaxRoot + " changed: " + maxRootPrefString);
 
            kernel.setMaxRoot(Integer.valueOf(maxRootPrefString));
         }
     }
+
 }

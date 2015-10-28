@@ -1,25 +1,21 @@
 package eu.jprichter.squaresandroots.ui;
 
 import android.content.Intent;
-import android.hardware.display.DisplayManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Gallery;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.inject.Inject;
 
 import eu.jprichter.squaresandroots.R;
 import eu.jprichter.squaresandroots.kernel.IKernel;
+import eu.jprichter.squaresandroots.ui.settings.SettingsActivity;
 import roboguice.activity.GuiceAppCompatActivity;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
@@ -75,14 +71,6 @@ public class QuestionActivity extends GuiceAppCompatActivity {
         questionText.setText(rootQuestion + " * " + rootQuestion + " = ?");
         editText.addTextChangedListener(new ButtonEnablerTextWatcher(checkButton));
 
-        /*
-        image = new StatisticsDrawableView(this);
-        image.setLayoutParams(new Gallery.LayoutParams(Gallery.LayoutParams.WRAP_CONTENT,
-                Gallery.LayoutParams.WRAP_CONTENT));
-
-        // Add the ImageView to the layout
-        statisticsRelLay.addView(image);
-    */
     }
 
     @Override

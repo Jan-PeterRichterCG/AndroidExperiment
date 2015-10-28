@@ -10,9 +10,13 @@ import android.support.v7.widget.LinearLayoutCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.google.inject.Inject;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.jprichter.squaresandroots.kernel.impl.Kernel;
+import roboguice.RoboGuice;
 import roboguice.util.Ln;
 
 /**
@@ -20,9 +24,19 @@ import roboguice.util.Ln;
  */
 public class StatisticsDrawableView extends View {
     private List<ShapeDrawable> diagramBlocks = new ArrayList<ShapeDrawable>();
+    private ShapeDrawable frame;
+
+    @Inject Kernel kernel;
 
     public StatisticsDrawableView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
+
+        if (!isInEditMode()) {
+            RoboGuice.getInjector(getContext()).injectMembers(this);
+
+            setMinimumHeight(kernel.getMaxRoot()*20);
+        }
+
 
         Ln.d("XXXXXXXXXXXXXXXXXX StatisticsDrawableView created.");
 
@@ -34,8 +48,27 @@ public class StatisticsDrawableView extends View {
         }
     }
 
+    @Override
+    protected void onSizeChanged(int w, int h, int oldW, int oldH) {
+        super.onSizeChanged(w, h, oldW, oldH);
+
+        Ln.d("XXXXXXXXXXXXXXXXXX StatisticsDrawableView measured. Width = " +
+                w + " Height = " + h);
+
+        int maxRoot = kernel.getMaxRoot();
+
+
+        frame = new ShapeDrawable(new RectShape());
+        frame.getPaint().setColor(0xffff0000);
+        frame.setBounds(0, 0, w, h);
+
+
+    }
+
     protected void onDraw(Canvas canvas) {
         Ln.d("XXXXXXXXXXXXXXXXXX StatisticsDrawableView drawn.");
+
+        frame.draw(canvas);
 
         for(ShapeDrawable s : diagramBlocks) {
             s.draw(canvas);

@@ -23,7 +23,7 @@ public class SquaresRootsApp extends Application {
         context = getApplicationContext();
         resources = getResources();
 
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
     }
 
     public static Context getStaticContext() {

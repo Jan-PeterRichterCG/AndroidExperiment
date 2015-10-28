@@ -52,6 +52,13 @@ public class Kernel implements IKernel {
     }
 
     public void setMaxRoot(int maxRoot) {
+
+        Ln.d("XXXXXXXXXXXXXXXXXX Kernel: set maxRoot to " + maxRoot);
+
+        if(maxRoot < MIN_MAX_ROOT || maxRoot > MAX_MAX_ROOT)
+            throw new IllegalArgumentException("maxRoot must be in [" + MIN_MAX_ROOT + " ... " +
+            MAX_MAX_ROOT + "].");
+
         this.maxRoot = maxRoot;
     }
 

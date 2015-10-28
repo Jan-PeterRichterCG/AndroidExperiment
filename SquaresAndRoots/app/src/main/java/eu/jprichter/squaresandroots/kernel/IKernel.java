@@ -8,6 +8,15 @@ import com.google.inject.Inject;
  */
 public interface IKernel {
 
+    /**
+     *  The minimum for the maxRoot parameter
+     */
+    public static int MIN_MAX_ROOT = 10;
+    /**
+     * The maximum for the maxRoot parameter
+     */
+    public static int MAX_MAX_ROOT = 30;
+
     // public static final String KEY_PREF_MAX_ROOT = "pref_max_root";
 
     /** Get the maximum number of successful attempts for a root
