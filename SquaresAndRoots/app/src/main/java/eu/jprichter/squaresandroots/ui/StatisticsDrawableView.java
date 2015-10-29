@@ -13,6 +13,8 @@ import android.view.View;
 
 import com.google.inject.Inject;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,22 +30,23 @@ import roboguice.util.Ln;
 public class StatisticsDrawableView extends View {
     private List<ShapeDrawable> diagramBlocks = new ArrayList<ShapeDrawable>();
     private int diagramBlocksIsValidForMaxRoot = 0;
-    private ShapeDrawable frame;
+
+    // private ShapeDrawable frame;
 
     @Inject
     Kernel kernel;
 
     private static final int LEFT_MARGIN = 10;
     private static final int LEGEND_COLUMN_WIDTH = 60;
+    private static final int LEGEND_COLUMN_MARGIN = 10;
     private static final int TOP_MARGIN = 10;
     private static final int BAR_HEIGHT = 40;
     private static final int BAR_VERTICAL_SPACING = 5;
     private static final int BAR_WIDTH = 150;
     private static final int BAR_HORIZONTAL_SPACING = 5;
-    private static final int TEXT_ADJUSTMENT = 5;
-    private static final int LINE_WIDTH = 1;
-    private static final int SUCCESS_COLOR = 0xFF00F000;
-    private static final int FAILURE_COLOR = 0xFFF00000;
+    private static final int TEXT_ADJUSTMENT = 10;
+    private static final int SUCCESS_COLOR = 0xFF00E000;
+    private static final int FAILURE_COLOR = 0xFFE00000;
 
     public StatisticsDrawableView(Context context) {
         super(context);
@@ -64,25 +67,16 @@ public class StatisticsDrawableView extends View {
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldW, int oldH) {
-        super.onSizeChanged(w, h, oldW, oldH);
-
-        Ln.d("XXXXXXXXXXXXXXXXXX StatisticsDrawableView measured. Width = " + w + " Height = " + h);
-
-        prepareFrame(w,h);
-    }
-
-    @Override
     protected void onDraw(Canvas canvas) {
         Ln.d("XXXXXXXXXXXXXXXXXX redraw StatisticsDrawableView");
+
+        this.setBackgroundColor(Color.DKGRAY);
 
         if(diagramBlocksIsValidForMaxRoot != kernel.getMaxRoot()) {
             /* do this only if maxRoot has changed */
             prepareDiagramBlocks();
             diagramBlocksIsValidForMaxRoot = kernel.getMaxRoot();
         }
-
-        frame.draw(canvas);
 
         for (ShapeDrawable s : diagramBlocks) {
             s.draw(canvas);
@@ -91,30 +85,16 @@ public class StatisticsDrawableView extends View {
         if (!isInEditMode()) {
 
             Paint paint = new Paint();
-            paint.setColor(Color.BLACK);
+            paint.setColor(Color.WHITE);
             paint.setTextSize(BAR_HEIGHT);
+            paint.setTextAlign(Paint.Align.RIGHT);
             for (int i = 1; i <= kernel.getMaxRoot(); i++) {
-                canvas.drawText(Integer.valueOf(i).toString(),
-                        LEFT_MARGIN,
+                canvas.drawText(String.format("%2d", i),
+                        LEFT_MARGIN + LEGEND_COLUMN_WIDTH,
                         TOP_MARGIN + i * (BAR_HEIGHT + BAR_VERTICAL_SPACING) - TEXT_ADJUSTMENT,
                         paint);
             }
         }
-    }
-
-    /**
-     * Prepare a frame as a ShapeDrawable
-     */
-    private void prepareFrame(int w, int h) {
-
-        Path path = new Path();
-        path.addRect(LEFT_MARGIN / 2, TOP_MARGIN / 2, w - LEFT_MARGIN, h - TOP_MARGIN, Path.Direction.CW);
-        frame = new ShapeDrawable(new PathShape(path, w, h));
-        Paint paint = frame.getPaint();
-        paint.setColor(Color.BLACK);
-        paint.setStrokeWidth(LINE_WIDTH);
-        paint.setStyle(Paint.Style.STROKE);
-        frame.setBounds(0, 0, w, h);
     }
 
     /**
@@ -125,7 +105,6 @@ public class StatisticsDrawableView extends View {
         diagramBlocks.removeAll(diagramBlocks);
 
         if (!isInEditMode()) {
-            RoboGuice.getInjector(getContext()).injectMembers(this);
             setMinimumHeight(2 * TOP_MARGIN +
                     kernel.getMaxRoot() * (BAR_HEIGHT + BAR_VERTICAL_SPACING));
 
@@ -137,7 +116,7 @@ public class StatisticsDrawableView extends View {
                 for (s = 1; s <= succ; s++) {
                     ShapeDrawable shapeDrawable = new ShapeDrawable(new RectShape());
                     shapeDrawable.getPaint().setColor(SUCCESS_COLOR);
-                    int x1 = LEFT_MARGIN + LEGEND_COLUMN_WIDTH +
+                    int x1 = LEFT_MARGIN + LEGEND_COLUMN_WIDTH + LEGEND_COLUMN_MARGIN +
                             (s - 1) * (BAR_WIDTH + BAR_HORIZONTAL_SPACING);
                     int y1 = TOP_MARGIN + (root - 1) * (BAR_HEIGHT + BAR_VERTICAL_SPACING);
                     int x2 = x1 + BAR_WIDTH;
@@ -148,7 +127,7 @@ public class StatisticsDrawableView extends View {
                 for (int f = 1; f <= fail; f++) {
                     ShapeDrawable shapeDrawable = new ShapeDrawable(new RectShape());
                     shapeDrawable.getPaint().setColor(FAILURE_COLOR);
-                    int x1 = LEFT_MARGIN + +LEGEND_COLUMN_WIDTH +
+                    int x1 = LEFT_MARGIN + +LEGEND_COLUMN_WIDTH + LEGEND_COLUMN_MARGIN +
                             (s - 1 + f - 1) * (BAR_WIDTH + BAR_HORIZONTAL_SPACING);
                     int y1 = TOP_MARGIN + (root - 1) * (BAR_HEIGHT + BAR_VERTICAL_SPACING);
                     int x2 = x1 + BAR_WIDTH;
