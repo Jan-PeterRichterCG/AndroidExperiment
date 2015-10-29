@@ -47,8 +47,22 @@ public class QuestionActivity extends GuiceAppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Ln.d("XXXXXXXXXXXXXXXXXX Question Activity created.");
+
         if(savedInstanceState != null)
             rootQuestion = savedInstanceState.getInt(STATE_ROOT_QUESTION, 0);
+
+        editText.addTextChangedListener(new ButtonEnablerTextWatcher(checkButton));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Ln.d("XXXXXXXXXXXXXXXXXX Resume QuestionActivity - maxRoot: " + kernel.getMaxRoot() +
+                " rootQuestion:" + rootQuestion);
+
+        if(kernel.getMaxRoot() < rootQuestion)
+            rootQuestion = 0;
 
         if(rootQuestion == 0) {
             Ln.d("XXXXXXXXXXXXXXXXXX Generate new question.");
@@ -59,16 +73,11 @@ public class QuestionActivity extends GuiceAppCompatActivity {
                 kernel.resetStatistics();
                 rootQuestion =  kernel.getRandomRoot();
             }
+
+            editText.setText("");
         }
 
         questionText.setText(rootQuestion + " * " + rootQuestion + " = ?");
-        editText.addTextChangedListener(new ButtonEnablerTextWatcher(checkButton));
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Ln.d("XXXXXXXXXXXXXXXXXX Resume QuestionActivity - maxRoot: " + kernel.getMaxRoot());
 
         statisticsView.invalidate();
     }
