@@ -1,6 +1,9 @@
 package eu.jprichter.squaresandroots.kernel.impl;
 
+import android.content.ContentValues;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.util.SparseIntArray;
 
@@ -10,6 +13,8 @@ import eu.jprichter.squaresandroots.SquaresRootsApp;
 import eu.jprichter.squaresandroots.kernel.IKernel;
 import eu.jprichter.squaresandroots.R;
 
+import eu.jprichter.squaresandroots.kernel.impl.persistence.DbHelper;
+import eu.jprichter.squaresandroots.kernel.impl.persistence.StatisticsContract;
 import roboguice.util.Ln;
 
 /**
@@ -27,6 +32,9 @@ public class Kernel implements IKernel {
 
     private int maxRoot;
 
+    private DbHelper dbHelper = new DbHelper(SquaresRootsApp.getStaticContext());
+    private SQLiteDatabase db;
+    /* TODO eliminate success and failure Integer Arrays */
     private SparseIntArray successes;
     private SparseIntArray failures;
 
@@ -35,6 +43,7 @@ public class Kernel implements IKernel {
      */
     Kernel() {
         Ln.d("XXXXXXXXXXXXXXXXXX Kernel instantiation started");
+
         // read the persistent value of the maxRoot preference
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(SquaresRootsApp.getStaticContext());
         String keyPrefMaxRootString =SquaresRootsApp.getStaticResources().getString(R.string.key_pref_max_root);
@@ -42,7 +51,45 @@ public class Kernel implements IKernel {
         setMaxRoot(Integer.valueOf(maxRootPrefString));
         Ln.d("XXXXXXXXXXXXXXXXXX maxRoot set to '" + maxRootPrefString + "'");
 
-        resetStatistics();
+        successes = new SparseIntArray(maxRoot);
+        failures = new SparseIntArray(maxRoot);
+
+        /* TODO: check whether this is a performance risk and mitigate */
+        db = dbHelper.getWritableDatabase();
+
+        String[] columns = {
+                StatisticsContract.StatisticsEntry._ID,
+                StatisticsContract.StatisticsEntry.COLUMN_NAME_ROOT_ID,
+                StatisticsContract.StatisticsEntry.COLUMN_NAME_SUCCESSES,
+                StatisticsContract.StatisticsEntry.COLUMN_NAME_FAILURES
+        };
+
+        Ln.d("XXXXXXXXXXXXXXXXXX Read statistics from database");
+
+        Cursor cursor = db.query(StatisticsContract.StatisticsEntry.TABLE_NAME,
+                columns, null, null, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                long itemId = cursor.getLong(
+                        cursor.getColumnIndex(StatisticsContract.StatisticsEntry._ID));
+                int root = cursor.getInt(
+                        cursor.getColumnIndex(StatisticsContract.StatisticsEntry.COLUMN_NAME_ROOT_ID));
+                int succ = cursor.getInt(
+                        cursor.getColumnIndex(StatisticsContract.StatisticsEntry.COLUMN_NAME_SUCCESSES));
+                int fail = cursor.getInt(
+                        cursor.getColumnIndex(StatisticsContract.StatisticsEntry.COLUMN_NAME_FAILURES));
+                if(succ > 0)
+                    successes.put(root, succ);
+                if(fail > 0)
+                    failures.put(root,fail);
+                Ln.d("XXXXXXXXXXXXXXXXXX read from DB: id: " + itemId + " root: " + root +
+                        " succ: " + succ + " fail: " + fail);
+            } while (cursor.moveToNext());
+        } else {
+            Ln.d("XXXXXXXXXXXXXXXXXX Database is empty.");
+        }
+
     }
 
     public int getMaxSuccess() { return MAX_SUCCESS; }
@@ -84,9 +131,7 @@ public class Kernel implements IKernel {
         while(pick > 0) {
             root++;
             pick -= (MAX_SUCCESS - successes.get(root));
-            Ln.d("XXXXXXXXXXXXXXXXXX root: " + root + " reduced pick: " + pick);
         }
-
         return  (root);
 
     }
@@ -96,18 +141,51 @@ public class Kernel implements IKernel {
 
         successes = new SparseIntArray(maxRoot);
         failures = new SparseIntArray(maxRoot);
+
+        // empty database
+        long rowAffected = db.delete(StatisticsContract.StatisticsEntry.TABLE_NAME, "1", null);
+        Ln.d("XXXXXXXXXXXXXXXXXX Database cleared - rows affected: " + rowAffected);
     }
 
     @Override
     public boolean checkRootSquare(int root, int square) {
 
+        boolean result = false;
+
         if (root * root == square) {
             successes.put(root,(successes.get(root) + 1));
-            return true;
+            result = true;
         } else {
             failures.put(root,(failures.get(root) + 1));
-            return false;
+            result = false;
         }
+
+        // update database
+        Ln.d("XXXXXXXXXXXXXXXXXX update Database");
+
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(StatisticsContract.StatisticsEntry.COLUMN_NAME_SUCCESSES, successes.get(root));
+        values.put(StatisticsContract.StatisticsEntry.COLUMN_NAME_FAILURES, failures.get(root));
+        long rowId;
+        if(successes.get(root) + failures.get(root) == 1) {
+            values.put(StatisticsContract.StatisticsEntry.COLUMN_NAME_ROOT_ID, root);
+            // Insert the new row, returning the primary key value of the new row
+            rowId = db.insert(
+                    StatisticsContract.StatisticsEntry.TABLE_NAME,
+                    null,
+                    values);
+        } else {
+            rowId = db.update(
+                    StatisticsContract.StatisticsEntry.TABLE_NAME,
+                    values,
+                    StatisticsContract.StatisticsEntry.COLUMN_NAME_ROOT_ID + " LIKE ? ",
+                    new String[] {String.valueOf(root)}
+                    );
+        }
+        Ln.d("XXXXXXXXXXXXXXXXXX Database updated in row " + rowId);
+
+        return result;
     }
 
     @Override

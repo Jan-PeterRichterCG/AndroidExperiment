@@ -111,7 +111,6 @@ public class StatisticsDrawableView extends View {
             for (int root = 1; root <= kernel.getMaxRoot(); root++) {
                 int succ = kernel.getSucessful(root);
                 int fail = kernel.getFailed(root);
-                Ln.d("XXXXXXXXXXXXXXXXXX root: " + root + " succ: " + succ + " fail: " + fail);
                 int s;
                 for (s = 1; s <= succ; s++) {
                     ShapeDrawable shapeDrawable = new ShapeDrawable(new RectShape());
