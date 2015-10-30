@@ -4,10 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -53,6 +54,19 @@ public class QuestionActivity extends GuiceAppCompatActivity {
             rootQuestion = savedInstanceState.getInt(STATE_ROOT_QUESTION, 0);
 
         editText.addTextChangedListener(new ButtonEnablerTextWatcher(checkButton));
+
+        /* trigger change to the check activity if OK button on keyboard is pressed. */
+        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) ||
+                        (actionId == EditorInfo.IME_ACTION_DONE)) {
+                    Ln.d("XXXXXXXXXXXXXXXXXXXXX Enter pressed");
+                    if(v.getText().length() > 0) // only if non-empty solution given
+                        checkSolution(v);
+                }
+                return false;
+            }
+        });
     }
 
     @Override
