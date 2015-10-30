@@ -60,15 +60,23 @@ public interface IKernel {
     public boolean checkRootSquare(int root, int square);
 
     /**
-     * Get the statistics for successful attempts to guess/know the square of a given root
-     * @param root the given root
+     * A simple data container (resultset) for statistics queries
      */
-    public int getSucessful(int root);
+    public class StatisticsEntry {
+        public int root = 0;
+        public int successes = 0;
+        public int failures = 0;
 
+        public StatisticsEntry(int root) {
+            this.root = root;
+        }
+    }
     /**
-     * Get the statistics for failed attempts to guess/know the square of a given root
-     * @param root the given root
+     * get the statistics for one root
+     * @param root
+     * @return  the statistics entry from the database - or an entry containing 0 values for
+     * success and failure
      */
-    public int getFailed(int root);
+    public StatisticsEntry getStatistics(int root);
 
 }

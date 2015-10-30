@@ -34,9 +34,6 @@ public class Kernel implements IKernel {
 
     private DbHelper dbHelper = new DbHelper(SquaresRootsApp.getStaticContext());
     private SQLiteDatabase db;
-    /* TODO eliminate success and failure Integer Arrays */
-    private SparseIntArray successes;
-    private SparseIntArray failures;
 
     /**
      * Constructor to be used by RoboGuice only!
@@ -51,45 +48,8 @@ public class Kernel implements IKernel {
         setMaxRoot(Integer.valueOf(maxRootPrefString));
         Ln.d("XXXXXXXXXXXXXXXXXX maxRoot set to '" + maxRootPrefString + "'");
 
-        successes = new SparseIntArray(maxRoot);
-        failures = new SparseIntArray(maxRoot);
-
-        /* TODO: check whether this is a performance risk and mitigate */
+         /* TODO: check whether this is a performance risk and mitigate */
         db = dbHelper.getWritableDatabase();
-
-        String[] columns = {
-                StatisticsContract.StatisticsEntry._ID,
-                StatisticsContract.StatisticsEntry.COLUMN_NAME_ROOT_ID,
-                StatisticsContract.StatisticsEntry.COLUMN_NAME_SUCCESSES,
-                StatisticsContract.StatisticsEntry.COLUMN_NAME_FAILURES
-        };
-
-        Ln.d("XXXXXXXXXXXXXXXXXX Read statistics from database");
-
-        Cursor cursor = db.query(StatisticsContract.StatisticsEntry.TABLE_NAME,
-                columns, null, null, null, null, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                long itemId = cursor.getLong(
-                        cursor.getColumnIndex(StatisticsContract.StatisticsEntry._ID));
-                int root = cursor.getInt(
-                        cursor.getColumnIndex(StatisticsContract.StatisticsEntry.COLUMN_NAME_ROOT_ID));
-                int succ = cursor.getInt(
-                        cursor.getColumnIndex(StatisticsContract.StatisticsEntry.COLUMN_NAME_SUCCESSES));
-                int fail = cursor.getInt(
-                        cursor.getColumnIndex(StatisticsContract.StatisticsEntry.COLUMN_NAME_FAILURES));
-                if(succ > 0)
-                    successes.put(root, succ);
-                if(fail > 0)
-                    failures.put(root,fail);
-                Ln.d("XXXXXXXXXXXXXXXXXX read from DB: id: " + itemId + " root: " + root +
-                        " succ: " + succ + " fail: " + fail);
-            } while (cursor.moveToNext());
-        } else {
-            Ln.d("XXXXXXXXXXXXXXXXXX Database is empty.");
-        }
-
     }
 
     public int getMaxSuccess() { return MAX_SUCCESS; }
@@ -113,7 +73,7 @@ public class Kernel implements IKernel {
 
         int sumSuccesses = 0;
         for (int i=0; i<=maxRoot; i++) {
-            sumSuccesses += successes.get(i);
+            sumSuccesses += getStatistics(i).successes;
         }
 
         if(sumSuccesses == maxRoot * MAX_SUCCESS) {
@@ -130,7 +90,7 @@ public class Kernel implements IKernel {
         int root=0;
         while(pick > 0) {
             root++;
-            pick -= (MAX_SUCCESS - successes.get(root));
+            pick -= (MAX_SUCCESS - getStatistics(root).successes);
         }
         return  (root);
 
@@ -139,10 +99,7 @@ public class Kernel implements IKernel {
     public void resetStatistics() {
         Ln.d("XXXXXXXXXXXXXXXXXX resetting statistics!");
 
-        successes = new SparseIntArray(maxRoot);
-        failures = new SparseIntArray(maxRoot);
-
-        // empty database
+         // empty database
         long rowAffected = db.delete(StatisticsContract.StatisticsEntry.TABLE_NAME, "1", null);
         Ln.d("XXXXXXXXXXXXXXXXXX Database cleared - rows affected: " + rowAffected);
     }
@@ -150,13 +107,15 @@ public class Kernel implements IKernel {
     @Override
     public boolean checkRootSquare(int root, int square) {
 
+        StatisticsEntry statistics = getStatistics(root);
+
         boolean result = false;
 
         if (root * root == square) {
-            successes.put(root,(successes.get(root) + 1));
+            statistics.successes++;
             result = true;
         } else {
-            failures.put(root,(failures.get(root) + 1));
+            statistics.failures++;
             result = false;
         }
 
@@ -165,10 +124,10 @@ public class Kernel implements IKernel {
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
-        values.put(StatisticsContract.StatisticsEntry.COLUMN_NAME_SUCCESSES, successes.get(root));
-        values.put(StatisticsContract.StatisticsEntry.COLUMN_NAME_FAILURES, failures.get(root));
+        values.put(StatisticsContract.StatisticsEntry.COLUMN_NAME_SUCCESSES, statistics.successes);
+        values.put(StatisticsContract.StatisticsEntry.COLUMN_NAME_FAILURES, statistics.failures);
         long rowId;
-        if(successes.get(root) + failures.get(root) == 1) {
+        if(statistics.successes + statistics.failures == 1) {
             values.put(StatisticsContract.StatisticsEntry.COLUMN_NAME_ROOT_ID, root);
             // Insert the new row, returning the primary key value of the new row
             rowId = db.insert(
@@ -188,14 +147,43 @@ public class Kernel implements IKernel {
         return result;
     }
 
-    @Override
-    public int getSucessful(int root) {
-        return successes.get(root);
-    }
+    public StatisticsEntry getStatistics(int root) {
 
-    @Override
-    public int getFailed(int root) {
-        return failures.get(root);
+        String[] columns = {
+                StatisticsContract.StatisticsEntry._ID,
+                StatisticsContract.StatisticsEntry.COLUMN_NAME_ROOT_ID,
+                StatisticsContract.StatisticsEntry.COLUMN_NAME_SUCCESSES,
+                StatisticsContract.StatisticsEntry.COLUMN_NAME_FAILURES
+        };
+
+        Ln.d("XXXXXXXXXXXXXXXXXX Read statistics from database");
+
+        String[] selectionArgs = {String.valueOf(root)};
+        Cursor cursor = db.query(StatisticsContract.StatisticsEntry.TABLE_NAME,
+                columns,
+                StatisticsContract.StatisticsEntry.COLUMN_NAME_ROOT_ID + " LIKE ?",
+                selectionArgs, null, null, null, null);
+
+        StatisticsEntry statisticsEntry = new StatisticsEntry(root);
+        if (cursor.moveToFirst()) {
+            do {
+                long itemId = cursor.getLong(
+                        cursor.getColumnIndex(StatisticsContract.StatisticsEntry._ID));
+                statisticsEntry.root = cursor.getInt(
+                        cursor.getColumnIndex(StatisticsContract.StatisticsEntry.COLUMN_NAME_ROOT_ID));
+                statisticsEntry.successes = cursor.getInt(
+                        cursor.getColumnIndex(StatisticsContract.StatisticsEntry.COLUMN_NAME_SUCCESSES));
+                statisticsEntry.failures = cursor.getInt(
+                        cursor.getColumnIndex(StatisticsContract.StatisticsEntry.COLUMN_NAME_FAILURES));
+                Ln.d("XXXXXXXXXXXXXXXXXX read from DB: id: " + itemId + " root: " + statisticsEntry.root +
+                        " succ: " + statisticsEntry.successes + " fail: " + statisticsEntry.failures);
+            } while (cursor.moveToNext());
+        } else {
+            Ln.d("XXXXXXXXXXXXXXXXXX Database does not contain a row for root " + root);
+        }
+
+        return statisticsEntry;
+
     }
 
 }

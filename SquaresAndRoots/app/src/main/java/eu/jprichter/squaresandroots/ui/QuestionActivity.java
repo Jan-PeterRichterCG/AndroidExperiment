@@ -65,6 +65,7 @@ public class QuestionActivity extends GuiceAppCompatActivity {
             rootQuestion = 0;
 
         if(rootQuestion == 0) {
+            /* this resume is not just a re-activation; something fundamental has happened. */
             Ln.d("XXXXXXXXXXXXXXXXXX Generate new question.");
             rootQuestion =  kernel.getRandomRoot();
             if (rootQuestion == 0) {
@@ -75,11 +76,11 @@ public class QuestionActivity extends GuiceAppCompatActivity {
             }
 
             editText.setText("");
+
+            statisticsView.invalidateDiagramBlocks();
         }
 
         questionText.setText(rootQuestion + " * " + rootQuestion + " = ?");
-
-        statisticsView.invalidate();
     }
 
     private class ButtonEnablerTextWatcher implements TextWatcher {

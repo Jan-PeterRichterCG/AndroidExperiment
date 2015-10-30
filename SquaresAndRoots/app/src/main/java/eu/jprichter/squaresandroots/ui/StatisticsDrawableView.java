@@ -4,20 +4,17 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.PathShape;
 import android.graphics.drawable.shapes.RectShape;
 import android.util.AttributeSet;
 import android.view.View;
 
 import com.google.inject.Inject;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.jprichter.squaresandroots.kernel.IKernel;
 import eu.jprichter.squaresandroots.kernel.impl.Kernel;
 import roboguice.RoboGuice;
 import roboguice.util.Ln;
@@ -29,7 +26,8 @@ import roboguice.util.Ln;
  */
 public class StatisticsDrawableView extends View {
     private List<ShapeDrawable> diagramBlocks = new ArrayList<ShapeDrawable>();
-    private int diagramBlocksIsValidForMaxRoot = 0;
+    private int minimumHeightIsValidForMaxRoot = 0;
+    private boolean diagramBlocksAreValid = false;
 
     // private ShapeDrawable frame;
 
@@ -72,10 +70,16 @@ public class StatisticsDrawableView extends View {
 
         this.setBackgroundColor(Color.DKGRAY);
 
-        if(diagramBlocksIsValidForMaxRoot != kernel.getMaxRoot()) {
-            /* do this only if maxRoot has changed */
+        /* change the minimum height if we need more / less space.
+        Note that this will eventually lead to a complete redraw. */
+        if(minimumHeightIsValidForMaxRoot != kernel.getMaxRoot()) {
+            setMinimumHeight(2 * TOP_MARGIN +
+            kernel.getMaxRoot() * (BAR_HEIGHT + BAR_VERTICAL_SPACING));
+            minimumHeightIsValidForMaxRoot = kernel.getMaxRoot();
+        }
+
+        if(! diagramBlocksAreValid) {
             prepareDiagramBlocks();
-            diagramBlocksIsValidForMaxRoot = kernel.getMaxRoot();
         }
 
         for (ShapeDrawable s : diagramBlocks) {
@@ -97,6 +101,11 @@ public class StatisticsDrawableView extends View {
         }
     }
 
+    public void invalidateDiagramBlocks() {
+        Ln.d("XXXXXXXXXXXXXXXXXX Diagram Blocks invalidated");
+        diagramBlocksAreValid = false;
+    }
+
     /**
      * Prepare the list of ShapeDrawables that represent the statistics
      */
@@ -105,14 +114,10 @@ public class StatisticsDrawableView extends View {
         diagramBlocks.removeAll(diagramBlocks);
 
         if (!isInEditMode()) {
-            setMinimumHeight(2 * TOP_MARGIN +
-                    kernel.getMaxRoot() * (BAR_HEIGHT + BAR_VERTICAL_SPACING));
-
             for (int root = 1; root <= kernel.getMaxRoot(); root++) {
-                int succ = kernel.getSucessful(root);
-                int fail = kernel.getFailed(root);
+                IKernel.StatisticsEntry statistics = kernel.getStatistics(root);
                 int s;
-                for (s = 1; s <= succ; s++) {
+                for (s = 1; s <= statistics.successes; s++) {
                     ShapeDrawable shapeDrawable = new ShapeDrawable(new RectShape());
                     shapeDrawable.getPaint().setColor(SUCCESS_COLOR);
                     int x1 = LEFT_MARGIN + LEGEND_COLUMN_WIDTH + LEGEND_COLUMN_MARGIN +
@@ -123,7 +128,7 @@ public class StatisticsDrawableView extends View {
                     shapeDrawable.setBounds(x1, y1, x2, y2);
                     diagramBlocks.add(shapeDrawable);
                 }
-                for (int f = 1; f <= fail; f++) {
+                for (int f = 1; f <= statistics.failures; f++) {
                     ShapeDrawable shapeDrawable = new ShapeDrawable(new RectShape());
                     shapeDrawable.getPaint().setColor(FAILURE_COLOR);
                     int x1 = LEFT_MARGIN + +LEGEND_COLUMN_WIDTH + LEGEND_COLUMN_MARGIN +
@@ -136,6 +141,7 @@ public class StatisticsDrawableView extends View {
                 }
             }
         }
+        diagramBlocksAreValid = true;
 
     }
 }

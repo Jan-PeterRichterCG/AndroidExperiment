@@ -8,9 +8,7 @@ import com.google.inject.Inject;
 
 import eu.jprichter.squaresandroots.R;
 import eu.jprichter.squaresandroots.kernel.IKernel;
-import eu.jprichter.squaresandroots.ui.StatisticsDrawableView;
 import roboguice.activity.RoboPreferenceActivity;
-import roboguice.inject.InjectView;
 import roboguice.util.Ln;
 
 /**
