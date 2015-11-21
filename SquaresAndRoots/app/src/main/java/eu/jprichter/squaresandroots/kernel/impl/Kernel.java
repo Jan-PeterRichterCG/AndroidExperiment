@@ -30,6 +30,7 @@ public class Kernel implements IKernel {
     // the max number of successful guesses until the root will not be asked any more.
     private static final int MAX_SUCCESS = 3;
 
+    private int minRoot;
     private int maxRoot;
 
     private DbHelper dbHelper = new DbHelper(SquaresRootsApp.getStaticContext());
@@ -43,10 +44,16 @@ public class Kernel implements IKernel {
 
         // read the persistent value of the maxRoot preference
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(SquaresRootsApp.getStaticContext());
+
         String keyPrefMaxRootString =SquaresRootsApp.getStaticResources().getString(R.string.key_pref_max_root);
         String maxRootPrefString = sharedPref.getString(keyPrefMaxRootString, "");
         setMaxRoot(Integer.valueOf(maxRootPrefString));
         Ln.d("XXXXXXXXXXXXXXXXXX maxRoot set to '" + maxRootPrefString + "'");
+
+        String keyPrefMinRootString =SquaresRootsApp.getStaticResources().getString(R.string.key_pref_min_root);
+        String minRootPrefString = sharedPref.getString(keyPrefMinRootString, "");
+        setMinRoot(Integer.valueOf(minRootPrefString));
+        Ln.d("XXXXXXXXXXXXXXXXXX minRoot set to '" + minRootPrefString + "'");
 
          /* TODO: check whether this is a performance risk and mitigate */
         db = dbHelper.getWritableDatabase();
@@ -67,6 +74,21 @@ public class Kernel implements IKernel {
             MAX_MAX_ROOT + "].");
 
         this.maxRoot = maxRoot;
+    }
+
+    public int getMinRoot() {
+        return minRoot;
+    }
+
+    public void setMinRoot(int minRoot) {
+
+        Ln.d("XXXXXXXXXXXXXXXXXX Kernel: set minRoot to " + minRoot);
+
+        if(minRoot < MIN_MIN_ROOT || minRoot > MAX_MIN_ROOT)
+            throw new IllegalArgumentException("minRoot must be in [" + MIN_MIN_ROOT + " ... " +
+                    MAX_MIN_ROOT + "].");
+
+        this.minRoot = minRoot;
     }
 
     public int getRandomRoot() {

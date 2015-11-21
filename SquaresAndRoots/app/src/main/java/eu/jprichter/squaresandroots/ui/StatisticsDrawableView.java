@@ -26,7 +26,7 @@ import roboguice.util.Ln;
  */
 public class StatisticsDrawableView extends View {
     private List<ShapeDrawable> diagramBlocks = new ArrayList<ShapeDrawable>();
-    private int minimumHeightIsValidForMaxRoot = 0;
+    private int minimumHeightIsValidForNumOfRoots = 0;
     private boolean diagramBlocksAreValid = false;
 
     // private ShapeDrawable frame;
@@ -72,10 +72,10 @@ public class StatisticsDrawableView extends View {
 
         /* change the minimum height if we need more / less space.
         Note that this will eventually lead to a complete redraw. */
-        if(minimumHeightIsValidForMaxRoot != kernel.getMaxRoot()) {
+        if(minimumHeightIsValidForNumOfRoots != kernel.getMaxRoot() - kernel.getMinRoot() + 1) {
             setMinimumHeight(2 * TOP_MARGIN +
-            kernel.getMaxRoot() * (BAR_HEIGHT + BAR_VERTICAL_SPACING));
-            minimumHeightIsValidForMaxRoot = kernel.getMaxRoot();
+                    (kernel.getMaxRoot() - kernel.getMinRoot() + 1) * (BAR_HEIGHT + BAR_VERTICAL_SPACING));
+            minimumHeightIsValidForNumOfRoots = kernel.getMaxRoot() - kernel.getMinRoot() + 1;
         }
 
         if(! diagramBlocksAreValid) {
@@ -92,10 +92,10 @@ public class StatisticsDrawableView extends View {
             paint.setColor(Color.WHITE);
             paint.setTextSize(BAR_HEIGHT);
             paint.setTextAlign(Paint.Align.RIGHT);
-            for (int i = 1; i <= kernel.getMaxRoot(); i++) {
+            for (int i = kernel.getMinRoot(); i <= kernel.getMaxRoot(); i++) {
                 canvas.drawText(String.format("%2d", i),
                         LEFT_MARGIN + LEGEND_COLUMN_WIDTH,
-                        TOP_MARGIN + i * (BAR_HEIGHT + BAR_VERTICAL_SPACING) - TEXT_ADJUSTMENT,
+                        TOP_MARGIN + (i-kernel.getMinRoot() + 1) * (BAR_HEIGHT + BAR_VERTICAL_SPACING) - TEXT_ADJUSTMENT,
                         paint);
             }
         }
@@ -114,7 +114,7 @@ public class StatisticsDrawableView extends View {
         diagramBlocks.removeAll(diagramBlocks);
 
         if (!isInEditMode()) {
-            for (int root = 1; root <= kernel.getMaxRoot(); root++) {
+            for (int root = kernel.getMinRoot(); root <= kernel.getMaxRoot(); root++) {
                 IKernel.StatisticsEntry statistics = kernel.getStatistics(root);
                 int s;
                 for (s = 1; s <= statistics.successes; s++) {
@@ -122,7 +122,7 @@ public class StatisticsDrawableView extends View {
                     shapeDrawable.getPaint().setColor(SUCCESS_COLOR);
                     int x1 = LEFT_MARGIN + LEGEND_COLUMN_WIDTH + LEGEND_COLUMN_MARGIN +
                             (s - 1) * (BAR_WIDTH + BAR_HORIZONTAL_SPACING);
-                    int y1 = TOP_MARGIN + (root - 1) * (BAR_HEIGHT + BAR_VERTICAL_SPACING);
+                    int y1 = TOP_MARGIN + (root - kernel.getMinRoot()) * (BAR_HEIGHT + BAR_VERTICAL_SPACING);
                     int x2 = x1 + BAR_WIDTH;
                     int y2 = y1 + BAR_HEIGHT;
                     shapeDrawable.setBounds(x1, y1, x2, y2);
@@ -133,7 +133,7 @@ public class StatisticsDrawableView extends View {
                     shapeDrawable.getPaint().setColor(FAILURE_COLOR);
                     int x1 = LEFT_MARGIN + +LEGEND_COLUMN_WIDTH + LEGEND_COLUMN_MARGIN +
                             (s - 1 + f - 1) * (BAR_WIDTH + BAR_HORIZONTAL_SPACING);
-                    int y1 = TOP_MARGIN + (root - 1) * (BAR_HEIGHT + BAR_VERTICAL_SPACING);
+                    int y1 = TOP_MARGIN + (root - kernel.getMinRoot()) * (BAR_HEIGHT + BAR_VERTICAL_SPACING);
                     int x2 = x1 + BAR_WIDTH;
                     int y2 = y1 + BAR_HEIGHT;
                     shapeDrawable.setBounds(x1, y1, x2, y2);

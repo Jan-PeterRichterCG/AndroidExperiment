@@ -22,6 +22,7 @@ public class SettingsActivity extends RoboPreferenceActivity
     IKernel kernel;
 
     private MaxRootPreferenceStringValidator maxRootPreferenceStringValidator;
+    private MinRootPreferenceStringValidator minRootPreferenceStringValidator;
 
 
     @Override
@@ -31,6 +32,7 @@ public class SettingsActivity extends RoboPreferenceActivity
         addPreferencesFromResource(R.xml.preferences);
 
         maxRootPreferenceStringValidator = new MaxRootPreferenceStringValidator();
+        minRootPreferenceStringValidator = new MinRootPreferenceStringValidator();
     }
 
     @Override
@@ -41,11 +43,20 @@ public class SettingsActivity extends RoboPreferenceActivity
         String maxRootString = getPreferenceScreen().getSharedPreferences().getString(
                 getResources().getString(R.string.key_pref_max_root), "");
 
-        Preference pref = findPreference(getResources().getString(R.string.key_pref_max_root));
-        pref.setSummary(getResources().getString(R.string.pref_max_root_summary_prefix)
+        Preference pref_max_root = findPreference(getResources().getString(R.string.key_pref_max_root));
+        pref_max_root.setSummary(getResources().getString(R.string.pref_max_root_summary_prefix)
                 + maxRootString);
 
-        pref.setOnPreferenceChangeListener(maxRootPreferenceStringValidator);
+        pref_max_root.setOnPreferenceChangeListener(maxRootPreferenceStringValidator);
+
+        String minRootString = getPreferenceScreen().getSharedPreferences().getString(
+                getResources().getString(R.string.key_pref_min_root), "");
+
+        Preference pref_min_root = findPreference(getResources().getString(R.string.key_pref_min_root));
+        pref_min_root.setSummary(getResources().getString(R.string.pref_min_root_summary_prefix)
+                + minRootString);
+
+        pref_min_root.setOnPreferenceChangeListener(minRootPreferenceStringValidator);
 
         getPreferenceScreen().getSharedPreferences()
                 .registerOnSharedPreferenceChangeListener(this);
@@ -75,6 +86,24 @@ public class SettingsActivity extends RoboPreferenceActivity
             Ln.d("XXXXXXXXXXXXXXXXX SharedPreference " + keyPrefMaxRoot + " changed: " + maxRootPrefString);
 
             kernel.setMaxRoot(Integer.valueOf(maxRootPrefString));
+
+            return;
+        }
+
+        String keyPrefMinRoot = getResources().getString(R.string.key_pref_min_root);
+        if (key.equals(keyPrefMinRoot)) {
+
+            String minRootPrefString = sharedPreferences.getString(keyPrefMinRoot, "");
+
+            Preference pref = findPreference(keyPrefMinRoot);
+            pref.setSummary(getResources().getString(R.string.pref_max_root_summary_prefix)
+                    + minRootPrefString);
+
+            Ln.d("XXXXXXXXXXXXXXXXX SharedPreference " + keyPrefMinRoot + " changed: " + minRootPrefString);
+
+            kernel.setMinRoot(Integer.valueOf(minRootPrefString));
+
+            return;
         }
     }
 

@@ -72,8 +72,8 @@ public class QuestionActivity extends GuiceAppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Ln.d("XXXXXXXXXXXXXXXXXX Resume QuestionActivity - maxRoot: " + kernel.getMaxRoot() +
-                " rootQuestion:" + rootQuestion);
+        Ln.d("XXXXXXXXXXXXXXXXXX Resume QuestionActivity - minRoot: " + kernel.getMinRoot() +
+               " maxRoot: " + kernel.getMaxRoot() + " rootQuestion:" + rootQuestion);
 
         if(kernel.getMaxRoot() < rootQuestion)
             rootQuestion = 0;

@@ -11,6 +11,14 @@ public interface IKernel {
     /**
      *  The minimum for the maxRoot parameter
      */
+    public static int MIN_MIN_ROOT = 1;
+    /**
+     * The maximum for the maxRoot parameter
+     */
+    public static int MAX_MIN_ROOT = 10;
+    /**
+     *  The minimum for the maxRoot parameter
+     */
     public static int MIN_MAX_ROOT = 10;
     /**
      * The maximum for the maxRoot parameter
@@ -23,6 +31,17 @@ public interface IKernel {
      * @return the maximum number of successful attempts for a root
      */
     public int getMaxSuccess();
+
+    /**
+     * Get the minimum of randomly created roots.
+     * @return the minimum of randomly created roots
+     */
+    public int getMinRoot();
+    /**
+     * Set the minimum of randomly created roots.
+     * @param minRoot the minimum of randomly created roots
+     */
+    public void setMinRoot(int minRoot);
 
     /**
      * Get the maximumm of randomly created roots.
