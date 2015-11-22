@@ -38,6 +38,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="eu.jprichter.squaresandroots.ui.QuestionActivity" />
         </activity>
+        <activity
+            android:name=".ui.AboutActivity"
+            android:label="@string/title_activity_about"
+            android:parentActivityName=".ui.QuestionActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="eu.jprichter.squaresandroots.ui.QuestionActivity" />
+        </activity>
 
     </application>
 

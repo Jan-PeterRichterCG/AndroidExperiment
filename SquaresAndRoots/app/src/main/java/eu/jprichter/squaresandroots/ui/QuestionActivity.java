@@ -167,6 +167,18 @@ public class QuestionActivity extends GuiceAppCompatActivity {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
 
+            /* whenever the Settings are touched, the statistics shoulod be redrawn from scratch */
+            statisticsView.invalidateDiagramBlocks();
+
+            return true;
+        }
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_about) {
+
+            Intent intent = new Intent(this, AboutActivity.class);
+            startActivity(intent);
+
             return true;
         }
 

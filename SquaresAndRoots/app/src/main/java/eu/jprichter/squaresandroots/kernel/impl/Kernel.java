@@ -94,22 +94,23 @@ public class Kernel implements IKernel {
     public int getRandomRoot() {
 
         int sumSuccesses = 0;
-        for (int i=0; i<=maxRoot; i++) {
+        for (int i=minRoot; i<=maxRoot; i++) {
             sumSuccesses += getStatistics(i).successes;
         }
 
-        if(sumSuccesses == maxRoot * MAX_SUCCESS) {
-            Ln.d("XXXXXXXXXXXXXXXXXX sumSuccesses: " + sumSuccesses + " equals maxRoot * MAX_SUCCESS!");
+        if(sumSuccesses == (maxRoot - minRoot + 1) * MAX_SUCCESS) {
+            Ln.d("XXXXXXXXXXXXXXXXXX sumSuccesses: " + sumSuccesses +
+                    " equals (maxRoot - minRoot +1) * MAX_SUCCESS!");
             return 0;
         }
 
-        int triesLeft = maxRoot * MAX_SUCCESS - sumSuccesses;
+        int triesLeft = (maxRoot - minRoot + 1) * MAX_SUCCESS - sumSuccesses;
 
         int pick = (Double.valueOf(Math.random()*triesLeft)).intValue()+1;
 
         Ln.d("XXXXXXXXXXXXXXXXXX sumSuccesses: " + sumSuccesses + " triesLeft: " + triesLeft + " pick: " + pick);
 
-        int root=0;
+        int root=minRoot -1;
         while(pick > 0) {
             root++;
             pick -= (MAX_SUCCESS - getStatistics(root).successes);

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10pt"
+        android:layout_gravity="right" />
+
+    <TextView
+        android:layout_width="257dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/about_text"
+        android:id="@+id/aboutTextView"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:padding="10pt"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ok_button"
+        android:id="@+id/about_ok_button"
+        android:layout_gravity="center_horizontal"
+        android:onClick="navigateBack"/>
+
+       />
+</LinearLayout>
