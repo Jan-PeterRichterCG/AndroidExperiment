@@ -22,7 +22,7 @@
 
     <string name="title_activity_about">About</string>
     <string name="about_text">This app was created in order to learn some basic steps of
-    Android app programming. Also it is intended to help people remember the squares of some
+    Android app programming. Also, it is intended to help people remember the squares of some
         naturals.</string>
 
 </resources>
